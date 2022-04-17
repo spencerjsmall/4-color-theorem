@@ -96,9 +96,18 @@ pred isK5[g: Graph] {
 //     }
 // }
 
+// Checks if g1 is a subgraph of g2
+pred isSubgraph[g1: Graph, g2: Graph] {
+    // g1's nodes are a subset of g2's
+    g1.nodes in g2.nodes
+    // The graph must be wellformed
+    wellformed[g1]
+}
+
 run {
-    one g: Graph | {
+    some disj g, g2: Graph | {
         wellformed[g]
-        isK5[g]
+        wellformed[g2]
+        isSubgraph[g,g2]
     }
-} for exactly 1 Graph, 4 Int, exactly 5 Node
+} for exactly 2 Graph, 4 Int, exactly 3 Node
