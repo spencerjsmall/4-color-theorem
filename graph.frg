@@ -6,20 +6,16 @@ sig Green extends Color {}
 sig Blue extends Color {}
 sig Yellow extends Color {}
 
+// A node is a representation of a two dimensional region
+// where its edges are the nodes which the node "touches"
+// in its representation in 2D space.
 sig Node {
-    edges: set Node
-}
-
-// A region is a set of nodes which are the same color.
-sig Region {
-    boundary: set Node,
+    edges: set Node,
     coloring: one Color
 }
 
-// This could be a set of nodes instead?
-// Not sure what the benefit of a set of Regions is
+// A graph is a set of Nodes
 sig Graph {
-    regions: set Region,
     nodes: set Node
 }
 
@@ -53,31 +49,16 @@ pred wellformed[g: Graph] {
     all n: Node | {
         n not in n.edges
     }
-    // All nodes in the graph should be in a region
-    g.regions.boundary = g.nodes
-    // No node can occupy two regions
+    // All nodes must be in the graph
     all n: Node | {
-        no disj r1,r2: Region | {
-            n in r1.boundary
-            n in r2.boundary
-        }
-    }
-    // No two regions can have the same color
-    no disj r1,r2: Region | {
-        r1.coloring = r2.coloring
+        n in g.nodes
     }
 }
 
-// Assuming this takes in a graph for the case of
-// making subgraphs
+// Predicate which takes in a graph and checks if
+// the graph has a K3 subgraph
 pred containsK3[g: Graph] {
-    some disj v1, v2, v3, v4, v5, v6: Node | {
-        v1 in g.nodes
-        v2 in g.nodes
-        v3 in g.nodes
-        v4 in g.nodes
-        v5 in g.nodes
-        v6 in g.nodes
+    some disj v1, v2, v3, v4, v5, v6: g.nodes | {
         // Establishes that each of the graphs
         // halves (bipartite) are interconnected (3,3)
         v1 in v4.edges
@@ -99,10 +80,12 @@ pred containsK3[g: Graph] {
     }
 }
 
-// The graph must have 
+// Predicate which takes in a graph containing exactly 5 nodes and
+// checks whether the graph is a K5 graph.
 pred isK5[g: Graph] {
-    some disj a, b: g.nodes | {
-        some edges[a][b]
+    all disj a, b: g.nodes | {
+        b in edges[a]
+        a in edges[b]
     }
 }
 
@@ -116,6 +99,6 @@ pred isK5[g: Graph] {
 run {
     one g: Graph | {
         wellformed[g]
-        containsK3[g]
+        isK5[g]
     }
-} for exactly 1 Graph, 4 Int, 6 Node
+} for exactly 1 Graph, 4 Int, exactly 5 Node
