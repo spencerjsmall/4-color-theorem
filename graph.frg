@@ -10,13 +10,20 @@ sig Yellow extends Color {}
 // where its edges are the nodes which the node "touches"
 // in its representation in 2D space.
 sig Node {
-    edges: set Node,
     coloring: one Color
+    // edges: set Edge
 }
 
-// A graph is a set of Nodes
+// 
+sig Edge {
+    // Must be a set of two -- using a set to define bidirectionality
+    nodePair: set Node
+}
+
+// A graph is a set of Nodes and a set of Edges
 sig Graph {
-    nodes: set Node
+    nodes: set Node,
+    edges: set Edge
 }
 
 // Kuratowki's theorem:
@@ -29,85 +36,91 @@ sig Graph {
 // same color.
 
 pred wellformed[g: Graph] {
-    // I don't think we'll have to cover this case by definition
-    // of a set (each elem is unique), but I'll leave it here just in
-    // case.    
-    // all n, m: g.nodes | lone edges[n][m] -- no double-edges
-    // Covered symmetric case below    
-    // all n, m: g.nodes | n.edges[m] = m.edges[n] -- symmetric
-    // Covered self-loop case below
-    // no iden -- no self-loops
-    
+    // A node not having an edge to itself is implicitly implies when we contrain
+    // nodes field to be length 2
+    // All edges contain exactly two nodes
+    all e: Edge | {
+        #{n : Node | n in e.nodePair} = 2
+    }
 
-    // All nodes must be interconnected in some way
-    all n, m: g.nodes | n in m.^edges
-    // Edges must work both ways
-    all n,m : Node | {
-        m in n.edges implies n in m.edges
+    // All edges in the graph must be reachable
+    all e1, e2: g.edges | {
+        reachable[e1, e2, nodePair, ~nodePair]
     }
-    // A node cannot have an edge to itself
-    all n: Node | {
-        n not in n.edges
+}
+
+// Helper predicate to see if there is an edge between two nodes in the graph
+pred hasEdge[n1,n2: Node, g: Graph] {
+    some e: g.edges | {
+        n1 in e.nodePair
+        n2 in e.nodePair
     }
-    // All nodes must be in the graph
+}
+
+pred mainGraph[g: Graph] {
     all n: Node | {
         n in g.nodes
+    }
+    all e: Edge | {
+        e in g.edges
     }
 }
 
 // Predicate which takes in a graph and checks if
-// the graph has a K3 subgraph
-pred containsK3[g: Graph] {
+// the graph has a K33 subgraph
+pred containsK33[g: Graph] {
     some disj v1, v2, v3, v4, v5, v6: g.nodes | {
         // Establishes that each of the graphs
         // halves (bipartite) are interconnected (3,3)
-        v1 in v4.edges
-        v1 in v5.edges
-        v1 in v6.edges
-        v2 in v4.edges
-        v2 in v5.edges
-        v2 in v6.edges
-        v3 in v4.edges
-        v3 in v5.edges
-        v3 in v6.edges
-        // Holds definition for a bipartite graph
-        v1 not in v2.edges
-        v1 not in v3.edges
-        v2 not in v3.edges
-        v4 not in v5.edges
-        v4 not in v6.edges
-        v5 not in v6.edges        
+        hasEdge[v1,v4,g]
+        hasEdge[v1,v5,g]
+        hasEdge[v1,v6,g]
+        hasEdge[v2,v4,g]
+        hasEdge[v2,v5,g]
+        hasEdge[v2,v6,g]
+        hasEdge[v3,v4,g]
+        hasEdge[v3,v5,g]
+        hasEdge[v3,v6,g]     
     }
 }
 
 // Predicate which takes in a graph containing exactly 5 nodes and
 // checks whether the graph is a K5 graph.
-pred isK5[g: Graph] {
-    all disj a, b: g.nodes | {
-        b in edges[a]
-        a in edges[b]
-    }
-}
+// pred isK5[g: Graph] {
+//     all disj a, b: g.nodes | {
+//         b in edges[a]
+//         a in edges[b]
+//     }
+// }
 
+// Predicate for ensuring that a graph is planar through Kuratowski's
+// theorem.
 // pred kuratowski[g: Graph] {
-//     all subG: Graph | {        
-//         subG.edges in g.edges implies
-//         not isK5[subG] and not containsK33[subG]
+//     all subG: Graph | {
+//         isSubgraph[subG, g] implies
+//             not isK5[subG] and not containsK33[subG]
 //     }
 // }
 
 // Checks if g1 is a subgraph of g2
-pred isSubgraph[g1: Graph, g2: Graph] {
-    // g1's nodes are a subset of g2's
-    g1.nodes in g2.nodes
-    // The graph must be wellformed
-    wellformed[g1]
-}
+// pred isSubgraph[g1: Graph, g2: Graph] {
+//     // g1's nodes are a subset of g2's
+//     g1.nodes in g2.nodes
+//     // The graph must be wellformed
+//     wellformed[g1]
+// }
+
+// run {
+//     some g: Graph | {
+//         wellformed[g]
+//         isK5[g]
+//     }
+// } for exactly 1 Graph, 4 Int, exactly 5 Node
 
 run {
-    some disj g, g2: Graph | {
+    some g: Graph | {
         wellformed[g]
-        wellformed[g2]
-        isSubgraph[g,g2]
+        mainGraph[g]
+        containsK33[g]
     }
-} for exactly 2 Graph, 4 Int, exactly 3 Node
+} for exactly 1 Graph, 6 Int, exactly 6 Node, 9 Edge
