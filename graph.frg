@@ -221,22 +221,79 @@ pred isK5[g: Graph] {
 //     wellformed[g1]
 // }
 
+// Predicate which takes in a graph and evaluates if it is four colorable
 pred canFourColor[g: Graph] {
-    all e: Edge, n1,n2: Node | {
+    // For any set of distinct nodes, with an edge, the nodes should be
+    // different colors
+    all disj n1,n2: Node, e: Edge | {
         n1 in e.nodePair and n2 in e.nodePair implies {
             n1.coloring != n2.coloring
         }
     }
 }
 
+// A graph containing only three nodes is four colorable
+example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and canFourColor[g]} for {
+    Color = `Red0 + `Green0 + `Yellow0 + `Blue0
+    Red = `Red0
+    Green = `Green0
+    Yellow = `Yellow0
+    Blue = `Blue0
+    Graph = `Graph0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node1 +
+               `Edge1 -> `Node1 +
+               `Edge1 -> `Node2 +
+               `Edge2 -> `Node2 +
+               `Edge2 -> `Node0
+    coloring = `Node0 -> `Red0 +
+               `Node1 -> `Blue0 +
+               `Node2 -> `Yellow0
+}
+
+// Graph with four nodes which is four colorable
+example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and canFourColor[g]} for {
+    Color = `Red0 + `Green0 + `Yellow0 + `Blue0
+    Red = `Red0
+    Green = `Green0
+    Yellow = `Yellow0
+    Blue = `Blue0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2 +
+            `Graph0 -> `Node3 
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node1 +
+               `Edge1 -> `Node1 +
+               `Edge1 -> `Node2 +
+               `Edge2 -> `Node2 +
+               `Edge2 -> `Node3
+    coloring = `Node0 -> `Red0 +
+               `Node1 -> `Blue0 +
+               `Node2 -> `Red0 +
+               `Node3 -> `Blue0
+}
+
 test expect {
+    // A K5 graph cannot be 4 colored
     cannotFourColorK5: {some g: Graph | wellformed[g] and mainGraph[g] and isK5[g] and canFourColor[g]} 
     for exactly 1 Graph, 5 Int, exactly 5 Node, 10 Edge is unsat
 
-    cannotFourColorK33: {some g: Graph | wellformed[g] and mainGraph[g] and containsK33[g] and canFourColor[g]}
-    for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is unsat
+    // A K3,3 graph can be 4 colored (color one side one color and the other side another color)
+    canFourColorK33: {some g: Graph | wellformed[g] and mainGraph[g] and containsK33[g] and canFourColor[g]}
+    for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is sat
 }
 
+// Run statement for producing a K5 graph.
 // run {
 //     some g: Graph | {
 //         wellformed[g]
@@ -245,6 +302,7 @@ test expect {
 //     }
 // } for exactly 1 Graph, 5 Int, exactly 5 Node, 10 Edge
 
+// Run statement for producing a K3,3 graph.
 run {
     some g: Graph | {
         wellformed[g]
