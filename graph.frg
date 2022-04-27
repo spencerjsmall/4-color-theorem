@@ -46,6 +46,11 @@ pred wellformed[g: Graph] {
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
     }
+    all disj e1, e2: g.edges | {
+        some disj n1, n2: e1.nodePair | {
+            n1 not in e2.nodePair or n2 not in e2.nodePair
+        }
+    }
 }
 
 --------------------------------
@@ -349,14 +354,29 @@ example notK5Test is {some g: Graph | not isK5[g]} for {
                `Edge7 -> `Node3
 }
 
+test expect {
+    // A graph containing less than five nodes cannot have a K5 subgraph
+    fourNodeNotK5: {some g: Graph | (#{g.nodes} < 5) and isK5[g]} 
+    for exactly 1 Graph, 5 Int, 4 Node, 10 Edge is unsat
+    // A graph containing 6 nodes and at least 14 edges is always K5
+    // Why? -- A graph with 6 nodes can have up to (5 + 4 + 3 + 2 + 1) = 15
+    // edges. A K6 graph always contains a K5 subgraph. If we remove 1 edges at random,
+    // the other 5 nodes are still interconnected.
+    mustBeK5: {all g: Graph | (#{g.nodes} = 6) and (#{g.edges} >= 14) and wellformed[g] => isK5[g]}
+    for exactly 1 Graph, 6 Int, 6 Node, 15 Edge is theorem
+    // Same as previous test with larger bounds, works but takes 1 or 2 minutes to run
+    // mustBeK5Test2: {all g: Graph | (#{g.nodes} = 7) and (#{g.edges} >= 19) and wellformed[g] => isK5[g]}
+    // for exactly 1 Graph, 6 Int, 7 Node, 21 Edge is theorem
+}
+
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
-// pred kuratowski[g: Graph] {
-//     all subG: Graph | {
-//         isSubgraph[subG, g] implies
-//             not isK5[subG] and not containsK33[subG]
-//     }
-// }
+pred kuratowski[g: Graph] {
+    all subG: Graph | {
+        isSubgraph[subG, g] implies
+            not isK5[subG] and not containsK33[subG]
+    }
+}
 
 // Checks if g1 is a subgraph of g2
 // pred isSubgraph[g1: Graph, g2: Graph] {
