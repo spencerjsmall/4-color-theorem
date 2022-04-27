@@ -111,8 +111,6 @@ example isnotWellformed2 is not {some g: Graph | wellformed[g]} for {
                `Edge1 -> `Node3
 }
 
-
-
 // Helper predicate to see if there is an edge between two nodes in the graph
 pred hasEdge[n1,n2: Node, g: Graph] {
     some e: g.edges | {
@@ -157,51 +155,198 @@ pred containsK33[g: Graph] {
 // * Testing for containsK33 * //
 ---------------------------------
 
-// example containsK33Test is {some g: Graph | containsK33[g]} for {
-//     #Int = 5
-//     #Edge = 10
-//     Graph = `Graph0
-//     nodes = `Graph0 -> `Node0 +
-//             `Graph0 -> `Node1 +
-//             `Graph0 -> `Node2 +
-//             `Graph0 -> `Node3 +
-//             `Graph0 -> `Node4 +
-//             `Graph0 -> `Node5
-//     edges = `Graph0 -> `Edge0 +
-//             `Graph0 -> `Edge1 +
-//             `Graph0 -> `Edge2 +
-//             `Graph0 -> `Edge3 +
-//             `Graph0 -> `Edge4 +
-//             `Graph0 -> `Edge5 +
-//             `Graph0 -> `Edge6 +
-//             `Graph0 -> `Edge7 +
-//             `Graph0 -> `Edge8
-//     nodePair = `Edge0 -> `Node0 +
-//                `Edge0 -> `Node3 +
-//                `Edge1 -> `Node1 +
-//                `Edge1 -> `Node3 +
-//                `Edge2 -> `Node2 +
-//                `Edge2 -> `Node3 +
-//                `Edge3 -> `Node0 +
-//                `Edge3 -> `Node4 +
-//                `Edge4 -> `Node1 +
-//                `Edge4 -> `Node4 +
-//                `Edge5 -> `Node2 +
-//                `Edge5 -> `Node4 +
-//                `Edge6 -> `Node0 +
-//                `Edge6 -> `Node5 +
-//                `Edge7 -> `Node1 +
-//                `Edge7 -> `Node5 +
-//                `Edge8 -> `Node2 +
-//                `Edge8 -> `Node5
-// }
+// Test on the base definition of a K33 Graph:  
+example containsK33Test is {some g: Graph | containsK33[g]} for {
+    #Int = 5
+    Edge = `Edge0 + `Edge1 +`Edge2 + `Edge3 + `Edge4 + `Edge5 + `Edge6 +
+           `Edge7 + `Edge8
+    Node = `Node0 + `Node1 + `Node2 + `Node3 + `Node4 + `Node5
+    Graph = `Graph0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2 +
+            `Graph0 -> `Node3 +
+            `Graph0 -> `Node4 +
+            `Graph0 -> `Node5
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2 +
+            `Graph0 -> `Edge3 +
+            `Graph0 -> `Edge4 +
+            `Graph0 -> `Edge5 +
+            `Graph0 -> `Edge6 +
+            `Graph0 -> `Edge7 +
+            `Graph0 -> `Edge8
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node3 +
+               `Edge1 -> `Node1 +
+               `Edge1 -> `Node3 +
+               `Edge2 -> `Node2 +
+               `Edge2 -> `Node3 +
+               `Edge3 -> `Node0 +
+               `Edge3 -> `Node4 +
+               `Edge4 -> `Node1 +
+               `Edge4 -> `Node4 +
+               `Edge5 -> `Node2 +
+               `Edge5 -> `Node4 +
+               `Edge6 -> `Node0 +
+               `Edge6 -> `Node5 +
+               `Edge7 -> `Node1 +
+               `Edge7 -> `Node5 +
+               `Edge8 -> `Node2 +
+               `Edge8 -> `Node5
+}
+
+// Test on a Graph containing a K33 subgraph
+example containsK33Test2 is {some g: Graph | containsK33[g]} for {
+    #Int = 5
+    Edge = `Edge0 + `Edge1 +`Edge2 + `Edge3 + `Edge4 + `Edge5 + `Edge6 +
+           `Edge7 + `Edge8 + `Edge9
+    Node = `Node0 + `Node1 + `Node2 + `Node3 + `Node4 + `Node5 + `Node6
+    Graph = `Graph0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2 +
+            `Graph0 -> `Node3 +
+            `Graph0 -> `Node4 +
+            `Graph0 -> `Node5 +
+            `Graph0 -> `Node6
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2 +
+            `Graph0 -> `Edge3 +
+            `Graph0 -> `Edge4 +
+            `Graph0 -> `Edge5 +
+            `Graph0 -> `Edge6 +
+            `Graph0 -> `Edge7 +
+            `Graph0 -> `Edge8 +
+            `Graph0 -> `Edge9
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node3 +
+               `Edge1 -> `Node1 +
+               `Edge1 -> `Node3 +
+               `Edge2 -> `Node2 +
+               `Edge2 -> `Node3 +
+               `Edge3 -> `Node0 +
+               `Edge3 -> `Node4 +
+               `Edge4 -> `Node1 +
+               `Edge4 -> `Node4 +
+               `Edge5 -> `Node2 +
+               `Edge5 -> `Node4 +
+               `Edge6 -> `Node0 +
+               `Edge6 -> `Node5 +
+               `Edge7 -> `Node1 +
+               `Edge7 -> `Node5 +
+               `Edge8 -> `Node2 +
+               `Edge8 -> `Node5 +
+               `Edge9 -> `Node0 +
+               `Edge9 -> `Node6
+}
 
 // Predicate which takes in a graph containing exactly 5 nodes and
 // checks whether the graph is a K5 graph.
 pred isK5[g: Graph] {
-    all disj a, b: g.nodes | {
-        hasEdge[a, b, g]
+    // all disj a, b: g.nodes | {
+    //     hasEdge[a, b, g]
+    // }
+    some disj v1, v2, v3, v4, v5: g.nodes | {
+        hasEdge[v1,v2,g]   
+        hasEdge[v1,v3,g]
+        hasEdge[v1,v4,g]
+        hasEdge[v1,v5,g]
+        hasEdge[v2,v3,g]
+        hasEdge[v2,v4,g]
+        hasEdge[v2,v5,g]
+        hasEdge[v3,v4,g]
+        hasEdge[v3,v5,g]
+        hasEdge[v4,v5,g]  
     }
+}
+
+---------------------------------
+// * Testing for isK5 * //
+---------------------------------
+
+// Test on the base definition of a K5 Graph:  
+example isK5Test is {some g: Graph | isK5[g]} for {
+    #Int = 5
+    Edge = `Edge0 + `Edge1 +`Edge2 + `Edge3 + `Edge4 + `Edge5 + `Edge6 +
+           `Edge7 + `Edge8 + `Edge9
+    Node = `Node0 + `Node1 + `Node2 + `Node3 + `Node4
+    Graph = `Graph0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2 +
+            `Graph0 -> `Node3 +
+            `Graph0 -> `Node4
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2 +
+            `Graph0 -> `Edge3 +
+            `Graph0 -> `Edge4 +
+            `Graph0 -> `Edge5 +
+            `Graph0 -> `Edge6 +
+            `Graph0 -> `Edge7 +
+            `Graph0 -> `Edge8 +
+            `Graph0 -> `Edge9
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node1 +
+               `Edge1 -> `Node0 +
+               `Edge1 -> `Node2 +
+               `Edge2 -> `Node0 +
+               `Edge2 -> `Node3 +
+               `Edge3 -> `Node0 +
+               `Edge3 -> `Node4 +
+               `Edge4 -> `Node1 +
+               `Edge4 -> `Node2 +
+               `Edge5 -> `Node1 +
+               `Edge5 -> `Node3 +
+               `Edge6 -> `Node1 +
+               `Edge6 -> `Node4 +
+               `Edge7 -> `Node2 +
+               `Edge7 -> `Node3 +
+               `Edge8 -> `Node2 +
+               `Edge8 -> `Node4 +
+               `Edge9 -> `Node3 +
+               `Edge9 -> `Node4
+}
+
+// Test on a graph that doesn't contain a K5 subgraph 
+example notK5Test is {some g: Graph | not isK5[g]} for {
+    #Int = 5
+    Edge = `Edge0 + `Edge1 +`Edge2 + `Edge3 + `Edge4 + `Edge5 + `Edge6 +
+           `Edge7
+    Node = `Node0 + `Node1 + `Node2 + `Node3 + `Node4
+    Graph = `Graph0
+    nodes = `Graph0 -> `Node0 +
+            `Graph0 -> `Node1 +
+            `Graph0 -> `Node2 +
+            `Graph0 -> `Node3 +
+            `Graph0 -> `Node4
+    edges = `Graph0 -> `Edge0 +
+            `Graph0 -> `Edge1 +
+            `Graph0 -> `Edge2 +
+            `Graph0 -> `Edge3 +
+            `Graph0 -> `Edge4 +
+            `Graph0 -> `Edge5 +
+            `Graph0 -> `Edge6 +
+            `Graph0 -> `Edge7
+    nodePair = `Edge0 -> `Node0 +
+               `Edge0 -> `Node1 +
+               `Edge1 -> `Node0 +
+               `Edge1 -> `Node2 +
+               `Edge2 -> `Node0 +
+               `Edge2 -> `Node3 +
+               `Edge3 -> `Node0 +
+               `Edge3 -> `Node4 +
+               `Edge4 -> `Node1 +
+               `Edge4 -> `Node2 +
+               `Edge5 -> `Node1 +
+               `Edge5 -> `Node3 +
+               `Edge6 -> `Node1 +
+               `Edge6 -> `Node4 +
+               `Edge7 -> `Node2 +
+               `Edge7 -> `Node3
 }
 
 // Predicate for ensuring that a graph is planar through Kuratowski's
