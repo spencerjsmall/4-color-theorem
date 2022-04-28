@@ -1,12 +1,12 @@
 #lang forge
 
-abstract sig Color {
+sig Color {
     colorNodes: set Node
 }
-sig Red extends Color {}
-sig Green extends Color {}
-sig Yellow extends Color {}
-sig Blue extends Color {}
+// sig Red extends Color {}
+// sig Green extends Color {}
+// sig Yellow extends Color {}
+// sig Blue extends Color {}
 
 // A node is a representation of a two dimensional region
 // where its edges are the nodes which the node "touches"
@@ -394,14 +394,27 @@ test expect {
 // }
 
 // Predicate which takes in a graph and evaluates if it is four colorable
-pred canFourColor[g: Graph] {  
+// pred canFourColor[g: Graph] {  
+//     // No edge has nodes in the same color
+//     all e: g.edges | {
+//         all c: Color | {
+//             e.nodePair not in c.nodes
+//         }
+//     }
+// }
+
+pred canFourColor[red: Color, green: Color, yellow: Color, blue: Color, g: Graph] {
+    // All nodes are colored  
+    g.nodes in ((red.nodes + green.nodes) + (yellow.nodes + blue.nodes))
     // No edge has nodes in the same color
-    all e: g.edges | {
-        all c: Color | {
-            e.nodePair & c.colorNodes != e.nodePair
-        }
+    all e: g.edges | {        
+        e.nodePair not in red.nodes
+        e.nodePair not in green.nodes
+        e.nodePair not in yellow.nodes
+        e.nodePair not in blue.nodes
     }
 }
+
 
 // A graph containing only three nodes is four colorable
 example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and canFourColor[g]} for {
@@ -480,6 +493,19 @@ test expect {
 //         isK5[g]
 //     }
 // } for exactly 1 Graph, 5 Int, exactly 5 Node, 10 Edge
+
+test expect {
+    all g: Graph | {
+        (wellformed[g]
+        mainGraph[g]        
+        containsK33[g]) => {
+            some disj red, green, blue, yellow: Color | {
+                canFourColor[red,green,blue,yellow,g]
+            }
+        }
+    } for exactly 6 Int, exactly 6 Node, 9 Edge is theorem
+}
+
 
 // Run statement for producing a K3,3 graph.
 run {
