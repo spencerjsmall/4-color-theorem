@@ -38,19 +38,25 @@ pred wellformed[g: Graph] {
     // A node not having an edge to itself is implicitly implies when we contrain
     // nodes field to be length 2
     // All edges contain exactly two nodes
-    all e: Edge | {
+    all e: g.edges | {
         #{n : Node | n in e.nodePair} = 2
     }
-
+    // No nodes overlap between multiple colors
+    all disj c1, c2: Color | {
+        c1.nodes & c2.nodes = none
+    }
+    // All nodes belong to a color
+    Node in Color.nodes
     // All edges in the graph must be reachable
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
     }
+    // No two edges have same nodePair
     all disj e1, e2: g.edges | {
-        some disj n1, n2: e1.nodePair | {
-            n1 not in e2.nodePair or n2 not in e2.nodePair
-        }
+        e1.nodePair != e2.nodePair
     }
+    // All graph nodes are in its edges
+    g.nodes in g.edges.nodePair
 }
 
 --------------------------------
