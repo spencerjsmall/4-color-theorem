@@ -1,13 +1,4 @@
 #lang forge
-
-sig Color {
-    colorNodes: set Node
-}
-// sig Red extends Color {}
-// sig Green extends Color {}
-// sig Yellow extends Color {}
-// sig Blue extends Color {}
-
 // A node is a representation of a two dimensional region
 // where its edges are the nodes which the node "touches"
 // in its representation in 2D space.
@@ -41,12 +32,6 @@ pred wellformed[g: Graph] {
     all e: g.edges | {
         #{n : Node | n in e.nodePair} = 2
     }
-    // No nodes overlap between multiple colors
-    all disj c1, c2: Color | {
-        c1.colorNodes & c2.colorNodes = none
-    }
-    // All nodes belong to a color
-    Node in Color.colorNodes
     // All edges in the graph must be reachable
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
@@ -54,14 +39,6 @@ pred wellformed[g: Graph] {
     // No two edges have same nodePair
     all disj e1, e2: g.edges | {
         e1.nodePair != e2.nodePair
-    }
-    // All graph nodes are in its edges
-    g.nodes in g.edges.nodePair
-
-    no n: Node | {
-        all disj c1, c2: Color | {
-            n in c1.colorNodes and n in c2.colorNodes
-        }
     }
     // All graph nodes are in its edges
     g.nodes in g.edges.nodePair
@@ -403,26 +380,21 @@ test expect {
 //     }
 // }
 
-pred canFourColor[red: Color, green: Color, yellow: Color, blue: Color, g: Graph] {
-    // All nodes are colored  
-    g.nodes in ((red.nodes + green.nodes) + (yellow.nodes + blue.nodes))
-    // No edge has nodes in the same color
-    all e: g.edges | {        
-        e.nodePair not in red.nodes
-        e.nodePair not in green.nodes
-        e.nodePair not in yellow.nodes
-        e.nodePair not in blue.nodes
+pred canFourColor[g: Graph] {
+    some disj red, green, blue, yellow: set g.nodes | {
+        g.nodes in ((red + green) + (yellow + blue))
+        all e: g.edges | {        
+            e.nodePair not in red
+            e.nodePair not in green
+            e.nodePair not in yellow
+            e.nodePair not in blue
+        }
     }
 }
 
 
 // A graph containing only three nodes is four colorable
 example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and canFourColor[g]} for {
-    Color = `Red0 + `Green0 + `Yellow0 + `Blue0
-    Red = `Red0
-    Green = `Green0
-    Yellow = `Yellow0
-    Blue = `Blue0
     Graph = `Graph0
     nodes = `Graph0 -> `Node0 +
             `Graph0 -> `Node1 +
@@ -436,18 +408,10 @@ example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and c
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node0
-    colorNodes = `Red0 -> `Node0 +
-               `Blue0 -> `Node1 +
-               `Yellow0 -> `Node2
 }
 
 // Graph with four nodes which is four colorable
 example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and canFourColor[g]} for {
-    Color = `Red0 + `Green0 + `Yellow0 + `Blue0
-    Red = `Red0
-    Green = `Green0
-    Yellow = `Yellow0
-    Blue = `Blue0
     nodes = `Graph0 -> `Node0 +
             `Graph0 -> `Node1 +
             `Graph0 -> `Node2 +
@@ -461,10 +425,6 @@ example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and 
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node3
-    colorNodes = `Red0 -> `Node0 +
-               `Blue0 -> `Node1 +
-               `Yellow0 -> `Node2 +
-               `Green0 -> `Node3
 }
 
 test expect {
