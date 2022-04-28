@@ -1,7 +1,11 @@
 #lang forge
 
 abstract sig Color {
+<<<<<<< HEAD
     nodes: set Node
+=======
+    colorNodes: set Node
+>>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
 }
 sig Red extends Color {}
 sig Green extends Color {}
@@ -43,10 +47,17 @@ pred wellformed[g: Graph] {
     }
     // No nodes overlap between multiple colors
     all disj c1, c2: Color | {
+<<<<<<< HEAD
         c1.nodes & c2.nodes = none
     }
     // All nodes belong to a color
     Node in Color.nodes
+=======
+        c1.colorNodes & c2.colorNodes = none
+    }
+    // All nodes belong to a color
+    Node in Color.colorNodes
+>>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
     // All edges in the graph must be reachable
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
@@ -54,6 +65,17 @@ pred wellformed[g: Graph] {
     // No two edges have same nodePair
     all disj e1, e2: g.edges | {
         e1.nodePair != e2.nodePair
+<<<<<<< HEAD
+=======
+    }
+    // All graph nodes are in its edges
+    g.nodes in g.edges.nodePair
+
+    no n: Node | {
+        all disj c1, c2: Color | {
+            n in c1.colorNodes and n in c2.colorNodes
+        }
+>>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
     }
     // All graph nodes are in its edges
     g.nodes in g.edges.nodePair
@@ -369,6 +391,7 @@ test expect {
 
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
+<<<<<<< HEAD
 pred kuratowski[g: Graph] {
     all subG: Graph | {
         isSubgraph[subG, g] implies {
@@ -376,6 +399,15 @@ pred kuratowski[g: Graph] {
         }
     }
 }
+=======
+// pred kuratowski[g: Graph] {
+//     all subG: Graph | {
+//         isSubgraph[subG, g] implies {
+//             not isK5[subG] and not containsK33[subG]
+//         }
+//     }
+// }
+>>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
 
 // Checks if g1 is a subgraph of g2
 // pred isSubgraph[g1: Graph, g2: Graph] {
@@ -390,7 +422,11 @@ pred canFourColor[g: Graph] {
     // No edge has nodes in the same color
     all e: g.edges | {
         all c: Color | {
+<<<<<<< HEAD
             e.nodePair & c.nodes != e.nodePair
+=======
+            e.nodePair & c.colorNodes != e.nodePair
+>>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
         }
     }
 }
@@ -415,9 +451,9 @@ example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and c
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node0
-    coloring = `Node0 -> `Red0 +
-               `Node1 -> `Blue0 +
-               `Node2 -> `Yellow0
+    colorNodes = `Red0 -> `Node0 +
+               `Blue0 -> `Node1 +
+               `Yellow0 -> `Node2
 }
 
 // Graph with four nodes which is four colorable
@@ -440,10 +476,10 @@ example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and 
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node3
-    coloring = `Node0 -> `Red0 +
-               `Node1 -> `Blue0 +
-               `Node2 -> `Red0 +
-               `Node3 -> `Blue0
+    colorNodes = `Red0 -> `Node0 +
+               `Blue0 -> `Node1 +
+               `Yellow0 -> `Node2 +
+               `Green0 -> `Node3
 }
 
 test expect {
@@ -454,7 +490,15 @@ test expect {
     // A K3,3 graph can be 4 colored (color one side one color and the other side another color)
     canFourColorK33: {some g: Graph | wellformed[g] and mainGraph[g] and containsK33[g] and canFourColor[g]}
     for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is sat
+
+    // Want to show this!
+    // isFourColorable: {all g: Graph | wellformed[g] and mainGraph[g] implies canFourColor[g]}
 }
+
+// Counterexample case to current definitions
+// run {
+//     one g: Graph | {wellformed[g] and mainGraph[g] implies not canFourColor[g]}
+// }
 
 // Run statement for producing a K5 graph.
 // run {
