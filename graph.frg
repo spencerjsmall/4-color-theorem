@@ -386,12 +386,13 @@ pred kuratowski[g: Graph] {
 // }
 
 // Predicate which takes in a graph and evaluates if it is four colorable
-pred canFourColor[g: Graph] {
-    // For any set of distinct nodes, with an edge, the nodes should be
-    // different colors
-    all disj n1,n2: Node, e: Edge | {
-        n1 in e.nodePair and n2 in e.nodePair implies {
-            n1.coloring != n2.coloring
+pred canFourColor[g: Graph] {  
+    // All nodes are colored
+    g.nodes in Color
+    // No edge has nodes in the same color
+    all e: g.edges | {
+        all c: Color | {
+            e.nodePair & c.nodes != e.nodepair
         }
     }
 }
