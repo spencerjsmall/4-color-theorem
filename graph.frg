@@ -1,17 +1,17 @@
 #lang forge
 
-abstract sig Color {}
+abstract sig Color {
+    colorNodes: set Node
+}
 sig Red extends Color {}
 sig Green extends Color {}
-sig Blue extends Color {}
 sig Yellow extends Color {}
+sig Blue extends Color {}
 
 // A node is a representation of a two dimensional region
 // where its edges are the nodes which the node "touches"
 // in its representation in 2D space.
-sig Node {
-    coloring: one Color
-}
+sig Node {}
 
 // 
 sig Edge {
@@ -38,17 +38,29 @@ pred wellformed[g: Graph] {
     // A node not having an edge to itself is implicitly implies when we contrain
     // nodes field to be length 2
     // All edges contain exactly two nodes
-    all e: Edge | {
+    all e: g.edges | {
         #{n : Node | n in e.nodePair} = 2
     }
-
+    // No nodes overlap between multiple colors
+    all disj c1, c2: Color | {
+        c1.colorNodes & c2.colorNodes = none
+    }
+    // All nodes belong to a color
+    Node in Color.colorNodes
     // All edges in the graph must be reachable
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
     }
+    // No two edges have same nodePair
     all disj e1, e2: g.edges | {
-        some disj n1, n2: e1.nodePair | {
-            n1 not in e2.nodePair or n2 not in e2.nodePair
+        e1.nodePair != e2.nodePair
+    }
+    // All graph nodes are in its edges
+    g.nodes in g.edges.nodePair
+
+    no n: Node | {
+        all disj c1, c2: Color | {
+            n in c1.colorNodes and n in c2.colorNodes
         }
     }
 }
@@ -125,17 +137,9 @@ pred hasEdge[n1,n2: Node, g: Graph] {
 }
 
 pred mainGraph[g: Graph] {
-    all n: Node | {
-        n in g.nodes
-    }
-    all e: Edge | {
-        e in g.edges
-    }
-    all n: Node | {
-        some e: Edge | {
-            n in e.nodePair
-        }
-    }
+    Node in g.nodes
+    Edge in g.edges
+    Node in g.edges.nodePair
 }
 
 // Predicate which takes in a graph and checks if
@@ -371,12 +375,13 @@ test expect {
 
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
-pred kuratowski[g: Graph] {
-    all subG: Graph | {
-        isSubgraph[subG, g] implies
-            not isK5[subG] and not containsK33[subG]
-    }
-}
+// pred kuratowski[g: Graph] {
+//     all subG: Graph | {
+//         isSubgraph[subG, g] implies {
+//             not isK5[subG] and not containsK33[subG]
+//         }
+//     }
+// }
 
 // Checks if g1 is a subgraph of g2
 // pred isSubgraph[g1: Graph, g2: Graph] {
@@ -387,12 +392,11 @@ pred kuratowski[g: Graph] {
 // }
 
 // Predicate which takes in a graph and evaluates if it is four colorable
-pred canFourColor[g: Graph] {
-    // For any set of distinct nodes, with an edge, the nodes should be
-    // different colors
-    all disj n1,n2: Node, e: Edge | {
-        n1 in e.nodePair and n2 in e.nodePair implies {
-            n1.coloring != n2.coloring
+pred canFourColor[g: Graph] {  
+    // No edge has nodes in the same color
+    all e: g.edges | {
+        all c: Color | {
+            e.nodePair & c.colorNodes != e.nodePair
         }
     }
 }
@@ -417,9 +421,9 @@ example isFourColorable is {some g: Graph | wellformed[g] and mainGraph[g] and c
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node0
-    coloring = `Node0 -> `Red0 +
-               `Node1 -> `Blue0 +
-               `Node2 -> `Yellow0
+    colorNodes = `Red0 -> `Node0 +
+               `Blue0 -> `Node1 +
+               `Yellow0 -> `Node2
 }
 
 // Graph with four nodes which is four colorable
@@ -442,10 +446,10 @@ example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and 
                `Edge1 -> `Node2 +
                `Edge2 -> `Node2 +
                `Edge2 -> `Node3
-    coloring = `Node0 -> `Red0 +
-               `Node1 -> `Blue0 +
-               `Node2 -> `Red0 +
-               `Node3 -> `Blue0
+    colorNodes = `Red0 -> `Node0 +
+               `Blue0 -> `Node1 +
+               `Yellow0 -> `Node2 +
+               `Green0 -> `Node3
 }
 
 test expect {
@@ -456,7 +460,15 @@ test expect {
     // A K3,3 graph can be 4 colored (color one side one color and the other side another color)
     canFourColorK33: {some g: Graph | wellformed[g] and mainGraph[g] and containsK33[g] and canFourColor[g]}
     for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is sat
+
+    // Want to show this!
+    // isFourColorable: {all g: Graph | wellformed[g] and mainGraph[g] implies canFourColor[g]}
 }
+
+// Counterexample case to current definitions
+// run {
+//     one g: Graph | {wellformed[g] and mainGraph[g] implies not canFourColor[g]}
+// }
 
 // Run statement for producing a K5 graph.
 // run {
