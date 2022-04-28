@@ -352,33 +352,23 @@ test expect {
     // for exactly 1 Graph, 6 Int, 7 Node, 21 Edge is theorem
 }
 
+// Checks if g1 is a subgraph of g2
+pred isSubgraph[g1: Graph, g2: Graph] {
+    // g1's nodes are a subset of g2's
+    g1.edges in g2.edges    
+    // The graph must be wellformed
+    wellformed[g1]
+}
+
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
-// pred kuratowski[g: Graph] {
-//     all subG: Graph | {
-//         isSubgraph[subG, g] implies {
-//             not isK5[subG] and not containsK33[subG]
-//         }
-//     }
-// }
-
-// Checks if g1 is a subgraph of g2
-// pred isSubgraph[g1: Graph, g2: Graph] {
-//     // g1's nodes are a subset of g2's
-//     g1.nodes in g2.nodes
-//     // The graph must be wellformed
-//     wellformed[g1]
-// }
-
-// Predicate which takes in a graph and evaluates if it is four colorable
-// pred canFourColor[g: Graph] {  
-//     // No edge has nodes in the same color
-//     all e: g.edges | {
-//         all c: Color | {
-//             e.nodePair not in c.nodes
-//         }
-//     }
-// }
+pred isPlanar[g: Graph] {
+    all subG: Graph | {
+        isSubgraph[subG, g] implies {
+            not isK5[subG] and not containsK33[subG]
+        }
+    }
+}
 
 pred canFourColor[g: Graph] {
     some disj red, green, blue, yellow: set g.nodes | {
@@ -455,17 +445,8 @@ test expect {
 // } for exactly 1 Graph, 5 Int, exactly 5 Node, 10 Edge
 
 test expect {
-    all g: Graph | {
-        (wellformed[g]
-        mainGraph[g]        
-        containsK33[g]) => {
-            some disj red, green, blue, yellow: Color | {
-                canFourColor[red,green,blue,yellow,g]
-            }
-        }
-    } for exactly 6 Int, exactly 6 Node, 9 Edge is theorem
+    proof: {all g: Graph | wellformed[g] and isPlanar[g] => canFourColor[g]}
 }
-
 
 // Run statement for producing a K3,3 graph.
 run {
