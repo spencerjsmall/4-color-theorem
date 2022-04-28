@@ -1,11 +1,7 @@
 #lang forge
 
 abstract sig Color {
-<<<<<<< HEAD
-    nodes: set Node
-=======
     colorNodes: set Node
->>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
 }
 sig Red extends Color {}
 sig Green extends Color {}
@@ -47,17 +43,10 @@ pred wellformed[g: Graph] {
     }
     // No nodes overlap between multiple colors
     all disj c1, c2: Color | {
-<<<<<<< HEAD
-        c1.nodes & c2.nodes = none
-    }
-    // All nodes belong to a color
-    Node in Color.nodes
-=======
         c1.colorNodes & c2.colorNodes = none
     }
     // All nodes belong to a color
     Node in Color.colorNodes
->>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
     // All edges in the graph must be reachable
     all e1, e2: g.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
@@ -65,8 +54,6 @@ pred wellformed[g: Graph] {
     // No two edges have same nodePair
     all disj e1, e2: g.edges | {
         e1.nodePair != e2.nodePair
-<<<<<<< HEAD
-=======
     }
     // All graph nodes are in its edges
     g.nodes in g.edges.nodePair
@@ -75,7 +62,6 @@ pred wellformed[g: Graph] {
         all disj c1, c2: Color | {
             n in c1.colorNodes and n in c2.colorNodes
         }
->>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
     }
     // All graph nodes are in its edges
     g.nodes in g.edges.nodePair
@@ -391,15 +377,6 @@ test expect {
 
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
-<<<<<<< HEAD
-pred kuratowski[g: Graph] {
-    all subG: Graph | {
-        isSubgraph[subG, g] implies {
-            not isK5[subG] and not containsK33[subG]
-        }
-    }
-}
-=======
 // pred kuratowski[g: Graph] {
 //     all subG: Graph | {
 //         isSubgraph[subG, g] implies {
@@ -407,7 +384,6 @@ pred kuratowski[g: Graph] {
 //         }
 //     }
 // }
->>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
 
 // Checks if g1 is a subgraph of g2
 // pred isSubgraph[g1: Graph, g2: Graph] {
@@ -422,11 +398,7 @@ pred canFourColor[g: Graph] {
     // No edge has nodes in the same color
     all e: g.edges | {
         all c: Color | {
-<<<<<<< HEAD
-            e.nodePair & c.nodes != e.nodePair
-=======
             e.nodePair & c.colorNodes != e.nodePair
->>>>>>> 1ada79e6fcf711c54f7fb8a690127b830c7015e3
         }
     }
 }
