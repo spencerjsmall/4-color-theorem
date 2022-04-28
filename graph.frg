@@ -115,11 +115,11 @@ pred hasEdge[n1,n2: Node, g: Graph] {
     }
 }
 
-pred mainGraph[g: Graph] {
-    Node in g.nodes
-    Edge in g.edges
-    Node in g.edges.nodePair
-}
+// pred mainGraph[g: Graph] {
+//     Node in g.nodes
+//     Edge in g.edges
+//     Node in g.edges.nodePair
+// }
 
 // Predicate which takes in a graph and checks if
 // the graph has a K33 subgraph
@@ -429,11 +429,11 @@ example isFourColorable2 is {some g: Graph | wellformed[g] and mainGraph[g] and 
 
 test expect {
     // A K5 graph cannot be 4 colored
-    cannotFourColorK5: {some g: Graph | wellformed[g] and mainGraph[g] and isK5[g] and canFourColor[g]} 
+    cannotFourColorK5: {some g: Graph | wellformed[g] and isK5[g] and canFourColor[g]} 
     for exactly 1 Graph, 5 Int, exactly 5 Node, 10 Edge is unsat
 
     // A K3,3 graph can be 4 colored (color one side one color and the other side another color)
-    canFourColorK33: {some g: Graph | wellformed[g] and mainGraph[g] and containsK33[g] and canFourColor[g]}
+    canFourColorK33: {some g: Graph | wellformed[g] and containsK33[g] and canFourColor[g]}
     for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is sat
 
     // Want to show this!
