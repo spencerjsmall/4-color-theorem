@@ -131,17 +131,9 @@ pred hasEdge[n1,n2: Node, g: Graph] {
 }
 
 pred mainGraph[g: Graph] {
-    all n: Node | {
-        n in g.nodes
-    }
-    all e: Edge | {
-        e in g.edges
-    }
-    all n: Node | {
-        some e: Edge | {
-            n in e.nodePair
-        }
-    }
+    Node in g.nodes
+    Edge in g.edges
+    Node in g.edges.nodePair
 }
 
 // Predicate which takes in a graph and checks if
@@ -379,8 +371,9 @@ test expect {
 // theorem.
 pred kuratowski[g: Graph] {
     all subG: Graph | {
-        isSubgraph[subG, g] implies
+        isSubgraph[subG, g] implies {
             not isK5[subG] and not containsK33[subG]
+        }
     }
 }
 
