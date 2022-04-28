@@ -1,17 +1,17 @@
 #lang forge
 
-abstract sig Color {}
+abstract sig Color {
+    nodes: set Node
+}
 sig Red extends Color {}
 sig Green extends Color {}
-sig Blue extends Color {}
 sig Yellow extends Color {}
+sig Blue extends Color {}
 
 // A node is a representation of a two dimensional region
 // where its edges are the nodes which the node "touches"
 // in its representation in 2D space.
-sig Node {
-    coloring: one Color
-}
+sig Node {}
 
 // 
 sig Edge {
