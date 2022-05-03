@@ -3,15 +3,13 @@
 // where its edges are the nodes which the node "touches"
 // in its representation in 2D space.
 sig Node {}
-
-// 
+ 
 sig Edge {
     // Must be a set of two -- using a set to define bidirectionality
     nodePair: set Node
 }
 
-// A graph is a set of Nodes and a set of Edges
-sig Graph {
+one sig Graph {
     nodes: set Node,
     edges: set Edge
 }
@@ -29,28 +27,25 @@ sig Coloring {
 // such that each node -> node pair is such that the nodes are not the
 // same color.
 
-pred wellformed[g: Graph] {
+pred wellformed {
     // A node not having an edge to itself is implicitly implies when we contrain
     // nodes field to be length 2
     // All edges contain exactly two nodes
-    all e: g.edges | {
+    all e: Graph.edges | {
         #{n : Node | n in e.nodePair} = 2
     }
     // All edges in the graph must be reachable
-    all e1, e2: g.edges | {
+    all e1, e2: Graph.edges | {
         reachable[e1, e2, nodePair, ~nodePair]
     }
     // No two edges have same nodePair
-    all disj e1, e2: g.edges | {
+    all disj e1, e2: Graph.edges | {
         e1.nodePair != e2.nodePair
     }
     // All graph nodes are in its edges
-    g.nodes in g.edges.nodePair         
-}
-
-pred wellformedMain[g: Graph] {
-    wellformed[g]
+    nodes in edges.nodePair      
     // All nodes and edges must be in the graph
+<<<<<<< Updated upstream
     Node in g.nodes
     Edge in g.edges
 }
@@ -60,12 +55,17 @@ pred wellformedMain[g: Graph] {
 // generating coloring combinations for a graph,
 // we want to make sure no two Colorings are the same.
 pred wellformedColors {
+=======
+    Node in Graph.nodes
+    Edge in Graph.edges   
+>>>>>>> Stashed changes
     // No two colorings are the same   
     all disj c1, c2: Coloring | {
         c1.nodeSet != c2.nodeSet
     }
 }
 
+<<<<<<< Updated upstream
 // Helper predicate to see if there is an edge 
 // between two nodes in the graph
 pred hasEdge[n1,n2: Node, g: Graph] {
@@ -73,10 +73,23 @@ pred hasEdge[n1,n2: Node, g: Graph] {
         n1 in e.nodePair
         n2 in e.nodePair
     }
+=======
+// Helper predicate to see if there is an edge between two nodes in the graph
+pred hasEdge[n1,n2: Node] {
+    // Edge is in graph
+    some e: Graph.edges | {
+        n1 + n2 = e.nodePair
+    } or (
+    // Edge is in subdivided graph
+    some e1, e2: Graph.edges | {
+        n1 + n2 = e1.nodePair & e2.nodePair
+    })
+>>>>>>> Stashed changes
 }
 
 // Predicate which takes in a graph and checks if
 // the graph has a K33 subgraph
+<<<<<<< Updated upstream
 pred containsK33[g: Graph] {
     some disj v1, v2, v3, v4, v5, v6: g.nodes | {
         hasEdge[v1,v4,g]
@@ -88,11 +101,27 @@ pred containsK33[g: Graph] {
         hasEdge[v3,v4,g]
         hasEdge[v3,v5,g]
         hasEdge[v3,v6,g]     
+=======
+pred containsK33 {
+    some disj v1, v2, v3, v4, v5, v6: Graph.nodes | {
+        // Establishes that each of the graphs
+        // halves (bipartite) are interconnected (3,3)
+        hasEdge[v1,v4]
+        hasEdge[v1,v5]
+        hasEdge[v1,v6]
+        hasEdge[v2,v4]
+        hasEdge[v2,v5]
+        hasEdge[v2,v6]
+        hasEdge[v3,v4]
+        hasEdge[v3,v5]
+        hasEdge[v3,v6]     
+>>>>>>> Stashed changes
     }
 }
 
 // Predicate which takes in a graph containing exactly 5 nodes and
 // checks whether the graph is a K5 graph.
+<<<<<<< Updated upstream
 pred isK5[g: Graph] {
     // all disj a, b: g.nodes | {
     //     hasEdge[a, b, g]
@@ -132,23 +161,34 @@ pred isSubdivision[subD: Graph, main: Graph] {
                 e.nodePair = e1.nodePair - e2.nodePair
             }
         }
+=======
+pred containsK5 {
+    some disj v1, v2, v3, v4, v5: Graph.nodes | {
+        hasEdge[v1,v2]   
+        hasEdge[v1,v3]
+        hasEdge[v1,v4]
+        hasEdge[v1,v5]
+        hasEdge[v2,v3]
+        hasEdge[v2,v4]
+        hasEdge[v2,v5]
+        hasEdge[v3,v4]
+        hasEdge[v3,v5]
+        hasEdge[v4,v5]  
+>>>>>>> Stashed changes
     }
 }
 
 // Predicate for ensuring that a graph is planar through Kuratowski's
 // theorem.
-pred isPlanar[g: Graph] {
-    all subG: Graph | {
-        (isSubgraph[subG, g] or isSubdivision[subG, g]) implies {
-            not isK5[subG] and not containsK33[subG]         
-        }
-    }
+pred isPlanar {
+    not containsK5
+    not containsK33    
 }
 
-pred canFourColor[g: Graph] {
+pred canFourColor {
     (some disj red, green, blue, yellow: Coloring | {
-        g.nodes = ((red.nodeSet + green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
-        all e: g.edges | {        
+        Graph.nodes = ((red.nodeSet + green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
+        all e: Graph.edges | {        
             e.nodePair not in red.nodeSet
             e.nodePair not in green.nodeSet
             e.nodePair not in yellow.nodeSet
@@ -157,31 +197,32 @@ pred canFourColor[g: Graph] {
     })
     // Added additional cases for graphs with <= 3 nodes
     or (some disj green, blue, yellow: Coloring | {
-        g.nodes = ((green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
-        all e: g.edges | {        
+        Graph.nodes = ((green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
+        all e: Graph.edges | {        
             e.nodePair not in green.nodeSet
             e.nodePair not in yellow.nodeSet
             e.nodePair not in blue.nodeSet
         }
     })
     or (some disj blue, yellow: Coloring | {
-        g.nodes = (yellow.nodeSet + blue.nodeSet)
-        all e: g.edges | {        
+        Graph.nodes = (yellow.nodeSet + blue.nodeSet)
+        all e: Graph.edges | {        
             e.nodePair not in yellow.nodeSet
             e.nodePair not in blue.nodeSet
         }
     })
     or (one blue: Coloring | {
-        g.nodes = (blue.nodeSet)
-        all e: g.edges | {        
+        Graph.nodes = (blue.nodeSet)
+        all e: Graph.edges | {        
             e.nodePair not in blue.nodeSet
         }
     })
     or (
-        no g.nodes
+        no Graph.nodes
     )
 }
 
+<<<<<<< Updated upstream
 
 // A graph containing only three nodes is four colorable
 // example isFourColorable is {some g: Graph | wellformed[g] and canFourColor[g]} for {
@@ -286,3 +327,6 @@ test expect {
     fourColor6Node: {some g: Graph | planar => canFourColor[g]} for exactly 1 Graph, 6 Node, 
     exactly 64 Coloring is theorem
 }
+=======
+run {wellformed and isPlanar and canFourColor} for exactly 4 Node, exactly 16 Coloring
+>>>>>>> Stashed changes
