@@ -14,7 +14,7 @@ one sig Graph {
     edges: set Edge
 }
 
-sig Coloring {
+sig Color {
     nodeSet: set Node
 }
 
@@ -47,8 +47,8 @@ pred wellformed {
     // All nodes and edges must be in the graph
     Node in Graph.nodes
     Edge in Graph.edges   
-    // No two colorings are the same   
-    all disj c1, c2: Coloring | {
+    // No two Colors are the same   
+    all disj c1, c2: Color | {
         c1.nodeSet != c2.nodeSet
     }
 }
@@ -108,7 +108,7 @@ pred isPlanar {
 }
 
 pred canFourColor {
-    (some disj red, green, blue, yellow: Coloring | {
+    (some disj red, green, blue, yellow: Color | {
         Graph.nodes = ((red.nodeSet + green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
         all e: Graph.edges | {        
             e.nodePair not in red.nodeSet
@@ -118,7 +118,7 @@ pred canFourColor {
         }
     })
     // Added additional cases for graphs with <= 3 nodes
-    or (some disj green, blue, yellow: Coloring | {
+    or (some disj green, blue, yellow: Color | {
         Graph.nodes = ((green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
         all e: Graph.edges | {        
             e.nodePair not in green.nodeSet
@@ -126,14 +126,14 @@ pred canFourColor {
             e.nodePair not in blue.nodeSet
         }
     })
-    or (some disj blue, yellow: Coloring | {
+    or (some disj blue, yellow: Color | {
         Graph.nodes = (yellow.nodeSet + blue.nodeSet)
         all e: Graph.edges | {        
             e.nodePair not in yellow.nodeSet
             e.nodePair not in blue.nodeSet
         }
     })
-    or (one blue: Coloring | {
+    or (one blue: Color | {
         Graph.nodes = (blue.nodeSet)
         all e: Graph.edges | {        
             e.nodePair not in blue.nodeSet
@@ -144,4 +144,4 @@ pred canFourColor {
     )
 }
 
-run {wellformed and isPlanar and canFourColor} for exactly 4 Node, exactly 16 Coloring
+run {wellformed and isPlanar and canFourColor} for exactly 4 Node, exactly 16 Color
