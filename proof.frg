@@ -144,4 +144,8 @@ pred canFourColor {
     )
 }
 
+test expect {
+    proof: {(wellformed and isPlanar) implies canFourColor} for exactly 5 Node, exactly 32 Color is theorem
+}
+
 run {wellformed and isPlanar and canFourColor} for exactly 4 Node, exactly 16 Color
