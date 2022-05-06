@@ -60,8 +60,11 @@ pred hasEdge[n1,n2: Node] {
         n1 + n2 = e.nodePair
     } or (
     // Edge is in subdivided graph
-    some e1, e2: Graph.edges | {
-        n1 + n2 = e1.nodePair & e2.nodePair
+    some e1, e2: Graph.edges, n3: Graph.nodes | {
+        n3 != n1
+        n3 != n2
+        #{e: Graph.edges | n3 in e.nodePair} = 2
+        n1 + n2 = e1.nodePair + e2.nodePair - (e1.nodePair & e2.nodePair)
     })
 }
 
