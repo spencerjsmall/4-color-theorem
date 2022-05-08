@@ -69,9 +69,9 @@ pred containsK33 {
                     n1+n2 = e.nodePair
                 } or (
                     // or by a subdivided edge whose removed node is in neither c1,c2
-                    some n3: Graph.nodes | {
-                        n1+n3 in Graph.edges
-                        n2+n3 in Graph.edges
+                    some n3: Graph.nodes, e1, e2: Graph.edges | {
+                        n1+n3 in e1.nodePair
+                        n2+n3 in e2.nodePair
                         n3 not in (c1.nodeSet + c2.nodeSet)                        
                     }
                 )
@@ -94,9 +94,9 @@ pred containsK5 {
             } 
             or (
                 // or a subdivided edge whose removed node is not in the subset
-                some n3: Graph.nodes | {
-                    n1 + n3 in Graph.edges
-                    n2 + n3 in Graph.edges       
+                some n3: Graph.nodes, e1, e2: Graph.edges | {
+                    n1 + n3 in e1.nodePair
+                    n2 + n3 in e2.nodePair      
                     n3 not in c.nodeSet
                 }
             )
