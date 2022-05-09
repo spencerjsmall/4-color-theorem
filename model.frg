@@ -47,9 +47,9 @@ pred wellformed {
     // All nodes and edges must be in the graph
     Node in Graph.nodes
     Edge in Graph.edges   
-    // No two Colors are the same   
+    // No two Colors are the same       
     all disj c1, c2: Color | {
-        no (c1.nodeSet & c2.nodeSet)
+        c1.nodeSet != c2.nodeSet
     }
 }
 
@@ -143,9 +143,11 @@ pred canFourColor {
             e.nodePair not in blue.nodeSet
         }
     })
-    // or (
-    //     no Graph.nodes
-    // )
+    or (
+        no Graph.nodes
+    )
 }
 
-run {wellformed and isPlanar and canFourColor} for 7 Int, 10 Node, 15 Edge
+// Run statement for nontrivial visualization... change # nodes and edges for different outcomes
+run {wellformed and (#{n: Node | n in Graph.nodes} > 4) isPlanar and canFourColor} 
+    for 5 Int, exactly 9 Node, exactly 16 Edge

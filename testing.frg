@@ -1,5 +1,5 @@
 #lang forge
-open "proof.frg"
+open "model.frg"
 
 --------------------------------
 // * Testing for wellformed * //
@@ -160,7 +160,7 @@ test expect {
 }
 
 // --------------------------
-// // * Testing for isK5 * //
+// * Testing for isK5 * //
 // --------------------------
 
 // Test on the base definition of a K5 Graph:  
@@ -250,7 +250,7 @@ test expect {
 }
 
 // ---------------------------------
-// // * Testing for canFourColor * //
+// * Testing for canFourColor * //
 // ---------------------------------
 
 // A graph containing only three nodes is four colorable
@@ -334,8 +334,4 @@ test expect {
 
     fourColor5Node: {wellformed and isPlanar => canFourColor} for exactly 5 Node, 10 Edge,
     exactly 32 Color is theorem
-
-//     // Test should work in theory, takes too long
-//     fourColor6Node: {wellformed and isPlanar => canFourColor} for exactly 6 Node, 15 Edge,
-//     exactly 64 Color is theorem
 }

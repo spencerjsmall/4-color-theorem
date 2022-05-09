@@ -8,8 +8,10 @@ const nodeList = Node.atoms(true);
 const edgeList = Edge.atoms(true);
 const colorList = Color.atoms(true);
 
+// Library of colors for coloring
 var colorLib = ["#FF0000", "#FFFF00", "#00FF00", "#0000FF"];
 
+// Build color array
 var colors = [];
 colorList.forEach((c, i) => {
   var color = {
@@ -20,6 +22,7 @@ colorList.forEach((c, i) => {
   colors.push(color);
 });
 
+// Build nodes array
 var nodes = [];
 nodeList.forEach((n, i) => {
   var node = {
@@ -29,6 +32,7 @@ nodeList.forEach((n, i) => {
   nodes.push(node);
 });
 
+// Build edges array
 var edges = [];
 edgeList.forEach((e, i) => {
   pair = e.nodePair.toString().split("\n");
@@ -44,7 +48,7 @@ const graph = {
   links: edges,
 };
 
-// Credit: https://d3-graph-gallery.com/graph/network_basic.html
+// Following function credit: https://d3-graph-gallery.com/graph/network_basic.html
 function display(data) {
   // Initialize the links
   const link = d3
@@ -65,7 +69,7 @@ function display(data) {
       return d.fill;
     });
 
-  // Let's list the force we wanna apply on the network
+  // Let's list the force we want to apply on the network
   const simulation = d3
     .forceSimulation(data.nodes) // Force algorithm is applied to data.nodes
     .force(
@@ -77,7 +81,7 @@ function display(data) {
         }) // This provide  the id of a node
         .links(data.links) // and this the list of links
     )
-    .force("charge", d3.forceManyBody().strength(-12000 / data.nodes.length)) // This adds repulsion between nodes. Play with the -400 for the repulsion strength
+    .force("charge", d3.forceManyBody().strength(-20000 / data.nodes.length)) // This adds repulsion between nodes. Play with the -400 for the repulsion strength
     .force("center", d3.forceCenter(width / 2, height / 2)) // This force attracts nodes to the center of the svg area
     .on("end", ticked);
 
