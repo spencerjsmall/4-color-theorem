@@ -53,7 +53,7 @@ pred wellformed {
     }
 }
 
-// Predicate that checks whether the graph contains a homomorphic k## subgraph
+// Predicate that checks whether the graph contains a homomorphic k33 subgraph
 pred containsK33 {
     // Checks if there are two collections of nodes c1,c2 such that
     some disj c1, c2: Color | {
@@ -111,6 +111,8 @@ pred isPlanar {
     not containsK33    
 }
 
+// Predicate for checking if a graph is four colorable, utilizing the combinations of nodes
+// given by Color.
 pred canFourColor {
     (some disj red, green, blue, yellow: Color | {
         Graph.nodes = ((red.nodeSet + green.nodeSet) + (yellow.nodeSet + blue.nodeSet))
