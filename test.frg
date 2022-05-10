@@ -152,10 +152,10 @@ example containsK33Test3 is containsK33 for {
 test expect {
     //K33 tests:
     // Cannot have a K33 graph with <=5 nodes
-    fiveNodeNotK33: {wellformed and containsK33} for 6 Int, exactly 5 Node, 
+    fiveNodeNotK33: {wellformed and containsK33} for 5 Int, exactly 5 Node, 
     exactly 32 Color, 10 Edge is unsat
     // Cannot have a K33 graph with <= 8 edges
-    eightEdgeNotK33: {wellformed and containsK33} for 7 Int, exactly 6 Node, 
+    eightEdgeNotK33: {wellformed and containsK33} for 6 Int, exactly 6 Node, 
     exactly 64 Color, 8 Edge is unsat
 }
 
@@ -237,16 +237,16 @@ test expect {
 test expect {
     // A graph containing less than five nodes cannot have a K5 subgraph
     fourNodeNotK5: {one g: Graph | (#{g.nodes} < 5) and containsK5} 
-    for exactly 1 Graph, 5 Int, 4 Node, 10 Edge is unsat
+    for 5 Int, exactly 1 Graph, 4 Node, 10 Edge is unsat
     // A graph with <= 9 edges cannot be K5
-    nineEdgeNotK5: {wellformed and containsK5} for 6 Int, 
+    nineEdgeNotK5: {wellformed and containsK5} for 5 Int, 
     exactly 5 Node, exactly 32 Color, 9 Edge is unsat
     // A graph containing 6 nodes and at least 14 edges is always K5
     // Why? -- A graph with 6 nodes can have up to (5 + 4 + 3 + 2 + 1) = 15
     // edges. A K6 graph always contains a K5 subgraph. If we remove 1 edges at random,
     // the other 5 nodes are still interconnected.
     mustBeK5: {one g: Graph | (#{g.nodes} = 6) and (#{g.edges} >= 14) and wellformed => containsK5}
-    for exactly 1 Graph, 6 Int, 6 Node, 15 Edge, exactly 64 Color is theorem
+    for 6 Int, exactly 1 Graph, 6 Node, 15 Edge, exactly 64 Color is theorem
 }
 
 // ---------------------------------
@@ -323,15 +323,20 @@ test expect {
 
     // A K3,3 graph can be 4 colored (color one side one color and the other side another color)
     canFourColorK33: {wellformed and containsK33 and canFourColor}
-    for exactly 1 Graph, 5 Int, exactly 6 Node, 9 Edge is sat
+    for 6 Int, exactly 1 Graph, exactly 6 Node, 9 Edge is sat
 
     fourColor4Node: {wellformed and isPlanar => canFourColor} for exactly 1 Graph, 4 Node, 
     exactly 16 Color is theorem
 
     // Theorem doesn't work, some four colorable graphs aren't planar
-    converse5Node: {canFourColor => isPlanar} for exactly 5 Node, 10 Edge,
+    converse5Node: {canFourColor => isPlanar} for 5 Int, exactly 5 Node, 10 Edge,
     exactly 32 Color is sat
 
-    fourColor5Node: {wellformed and isPlanar => canFourColor} for exactly 5 Node, 10 Edge,
+    fourColor5Node: {wellformed and isPlanar => canFourColor} for 5 Int, exactly 5 Node, 10 Edge,
     exactly 32 Color is theorem
+    
+    // Verifying larger graphs reaches memory limit
+    //fourColor6Node: {wellformed and isPlanar => canFourColor} for 6 Int, exactly 6 Node, 15 Edge, exactly 64 Color is theorem
+    //fourColor7Node: {wellformed and isPlanar => canFourColor} for 7 Int, exactly 7 Node, 21 Edge, exactly 128 Color is theorem
+    //fourColor7Node: {wellformed and isPlanar => canFourColor} for 8 Int, exactly 8 Node, 28 Edge, exactly 256 Color is theorem
 }
