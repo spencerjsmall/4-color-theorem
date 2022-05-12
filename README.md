@@ -10,4 +10,4 @@ At first, we struggled conceptually with how to structure our model. For instanc
 ### Conclusion
 Overall, we are happy with the performance of our model, even if it can only be used to verify the Four Color Theorem up to five nodes. We were warned that this project may be impossible to do in Forge alone, so we consider this a success. To view instances with the visualizer, simply adjust the run constraints at the end of `model.frg` before running `racket model.frg` from the command line (a nontrivial run statement for `9 Node`s and `16 Edge`s and has been provided as default). After Sterling has launched and rendered the data, you can then copy and paste the contents of `viz.js` into the blank SVG file under the Script tab. Our visualizer displays the planar graph instance and colors its nodes in such a way that satisfies the Four Color Theorem:
 
-[![Video walkthrough of Visualizer](video_thumbnail.png)]({https://youtu.be/wP1Dl_kjZWM} "Video walkthrough of Visualizer")
+<a href="https://youtu.be/wP1Dl_kjZWM" rel="Video walkthrough of visualizer">![Video walkthrough of visualizer](video_thumbnail.png)</a>
